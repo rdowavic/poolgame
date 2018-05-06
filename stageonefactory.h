@@ -5,7 +5,7 @@ class StageOneFactory : public AbstractStageFactory {
 public:
     /**
      * @brief makeBall - construct a ball based on json
-     * @param ballData - our json data for this table
+     * @param ballData - our json data for this ball
      * @return
      */
     virtual Ball* makeBall(const QJsonObject& ballData) override;
@@ -16,4 +16,22 @@ public:
      * @return
      */
     virtual Table* makeTable(const QJsonObject& tableData) override;
+};
+
+class StageTwoFactory : public AbstractStageFactory {
+public:
+    /**
+     * @brief makeBall- returns a Stage 2 ball based on json input
+     * @param ballData - our json data for this ball
+     * @return pointer to a Ball object
+     */
+    virtual Ball* makeBall(const QJsonObject &ballData) override;
+
+    /**
+     * @brief makeTable - returns a Stage 2 Table (one with pockets)
+     * based on json input
+     * @param tableData
+     * @return pointer to a Table object
+     */
+    virtual Table* makeTable(const QJsonObject &tableData) override;
 };

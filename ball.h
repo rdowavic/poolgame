@@ -27,7 +27,7 @@ public:
      * @brief translate - Move the ball's position by provided vector
      * @param vec - vector
      */
-    virtual void translate(QVector2D vec) = 0;
+    virtual void translate(QVector2D vec) { m_pos += vec; }
 
     QVector2D getVelocity() const { return m_velocity; }
     /**
@@ -55,9 +55,16 @@ public:
      * @param painter - QPainter that is owned by the dialog
      */
     void render(QPainter &painter) override;
-    /**
-     * @brief translate - Move the ball's position by provided vector
-     * @param vec - vector
-     */
-    void translate(QVector2D vec) override;
 };
+
+class StageTwoBall : public Ball {
+public:
+    StageTwoBall(QColor colour, QVector2D position,
+                 QVector2D velocity, double mass, int radius,
+                 StageTwoBall* parent)
+        : Ball(colour, position, velocity, mass, radius), m_parent(parent) {}
+    virtual ~StageTwoBall();
+protected:
+    std::vector<StageTwoBall*>* m_children = nullptr;
+
+}

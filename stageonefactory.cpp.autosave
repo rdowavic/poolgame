@@ -38,4 +38,10 @@ Table* StageOneFactory::makeTable(const QJsonObject& tableData) {
 Ball* StageTwoFactory::makeBall(const QJsonObject &ballData) {
     // construct a ball from its values
     // how to deal with composite shit?? Have to think about that right now? Damn.
+    // TODO!!
+}
+
+Table* StageTwoFactory::makeTable(const QJsonObject &tableData) {
+    //construct a Table that has pockets
+    Table* table = StageOneFactory::makeTable()
 }
