@@ -21,7 +21,7 @@ public:
      * @brief render - draw the table to screen using the specified painter
      * @param painter - painter to use
      */
-    virtual void render(QPainter& painter) = 0;
+    virtual void render(QPainter& painter);
 
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }
@@ -35,11 +35,6 @@ public:
     StageOneTable(int width, int height, QColor colour, double friction) :
         // table isn't translated anywhere - starts at (0,0)
         Table(width, height, colour, friction, 0, 0) {}
-    /**
-     * @brief render - draw the stageonetable to screen using the specified painter
-     * @param painter - painter to use
-     */
-    virtual void render(QPainter &painter) override;
 };
 
 /**
@@ -74,7 +69,7 @@ public:
      * @brief render - draw the stagetwotable to screen with pockets
      * @param painter - the painter to use
      */
-    virtual void render(QPainter &painter) override;
+    void render(QPainter &painter) override;
 protected:
     std::vector<Pocket*>* m_pockets;
 };

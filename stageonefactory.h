@@ -34,4 +34,7 @@ public:
      * @return pointer to a Table object
      */
     virtual Table* makeTable(const QJsonObject &tableData) override;
+private:
+    StageTwoBall *makeChildBall(const QJsonObject &ballData, StageTwoBall *parent);
+    bool properlyContained(StageTwoBall *child, StageTwoBall *parent);
 };

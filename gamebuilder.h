@@ -35,7 +35,7 @@ public:
     StageOneBuilder() : GameBuilder(new StageOneFactory()) {}
 
     /**
-     * @brief addBall creates a ball to the current game being buil
+     * @brief addBall creates a ball to the current game being built
      * @param ballData - json object that is simply an element of the array of balls provided in the config
      */
     void addBall(QJsonObject &ballData) override;

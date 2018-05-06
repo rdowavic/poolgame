@@ -29,7 +29,7 @@ public:
      */
     virtual void translate(QVector2D vec) { m_pos += vec; }
 
-    QVector2D getVelocity() const { return m_velocity; }
+    virtual QVector2D getVelocity() const { return m_velocity; }
     /**
      * @brief changeVelocity - modify speed by a constant amount
      * @param delta - change in velocity (x,y)
@@ -63,8 +63,11 @@ public:
                  QVector2D velocity, double mass, int radius,
                  StageTwoBall* parent)
         : Ball(colour, position, velocity, mass, radius), m_parent(parent) {}
-    virtual ~StageTwoBall();
+    ~StageTwoBall();
+    QVector2D getVelocity() override;
+    void addChild(StageTwoBall* child);
 protected:
     std::vector<StageTwoBall*>* m_children = nullptr;
+    StageTwoBall* m_parent = nullptr; // do not own this, don't attempt to delete
 
 }
