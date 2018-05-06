@@ -12,6 +12,11 @@ void StageOneTable::render(QPainter &painter) {
     );
 }
 
+void StageTwoTable::~StageTwoTable() {
+    for (auto pocket : *m_pockets) delete pocket;
+    delete m_pockets;
+}
+
 Pocket::~Pocket() {
     delete m_ball;
 }

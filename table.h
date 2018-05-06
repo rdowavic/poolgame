@@ -68,6 +68,7 @@ class StageTwoTable : public Table {
 public:
     StageTwoTable(int width, int height, QColor colour, double friction) :
         Table(width, height, colour, friction, 0, 0) {}
+    ~StageTwoTable();
 
     /**
      * @brief render - draw the stagetwotable to screen with pockets
@@ -75,5 +76,5 @@ public:
      */
     virtual void render(QPainter &painter) override;
 protected:
-    std::vector<Pocket*> m_pockets;
+    std::vector<Pocket*>* m_pockets;
 };
