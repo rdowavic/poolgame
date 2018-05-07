@@ -37,4 +37,5 @@ public:
 private:
     StageTwoBall *makeChildBall(const QJsonObject &ballData, StageTwoBall *parent);
     bool properlyContained(StageTwoBall *child, StageTwoBall *parent);
+    Pocket *makePocket(const QJsonObject& pocketData);
 };

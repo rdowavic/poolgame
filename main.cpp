@@ -29,8 +29,14 @@ int main(int argc, char *argv[])
 
     // create our game based on our config
     GameDirector director(&conf);
+
+    // set it to be the stage two builder.. when do we choose the factory??
+    if (conf.contains("stage2") && conf.value("stage2").toBool() == true)
+        director.setBuilder(new StageTwoBuilder());
+    else
+        director.setBuilder(new StageOneBuilder());
+
     // set and transfer ownership of this builder to the director
-    director.setBuilder(new StageOneBuilder());
     Game* game = director.createGame();
 
     // display our dialog that contains our game and run

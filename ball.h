@@ -22,7 +22,7 @@ public:
      * @brief render - draw the ball to the screen
      * @param painter - QPainter that is owned by the dialog
      */
-    virtual void render(QPainter &painter) = 0;
+    virtual void render(QPainter &painter);
     /**
      * @brief translate - Move the ball's position by provided vector
      * @param vec - vector
@@ -40,7 +40,7 @@ public:
      * @param vel - vector
      */
     void multiplyVelocity(const QVector2D& vel) { m_velocity *= vel; }
-    double getMass() const { return m_mass; }
+    virtual double getMass() const { return m_mass; }
     double getRadius() const { return m_radius; }
     QVector2D getPosition() const { return m_pos; }
 };
@@ -50,11 +50,6 @@ public:
     StageOneBall(QColor colour, QVector2D position,
                  QVector2D velocity, double mass, int radius) :
         Ball(colour, position, velocity, mass, radius) {}
-    /**
-     * @brief render - draw the ball to the screen
-     * @param painter - QPainter that is owned by the dialog
-     */
-    void render(QPainter &painter) override;
 };
 
 class StageTwoBall : public Ball {
@@ -64,10 +59,16 @@ public:
                  StageTwoBall* parent)
         : Ball(colour, position, velocity, mass, radius), m_parent(parent) {}
     ~StageTwoBall();
-    QVector2D getVelocity() override;
+    virtual QVector2D getVelocity() const override;
+    virtual double getMass() const override;
+    virtual void render(QPainter& painter) override;
+    /**
+     * @brief addChild - add a child ball to the given StageTwoBall
+     * @param child - the child ball to add
+     */
     void addChild(StageTwoBall* child);
 protected:
     std::vector<StageTwoBall*>* m_children = nullptr;
     StageTwoBall* m_parent = nullptr; // do not own this, don't attempt to delete
 
-}
+};

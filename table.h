@@ -46,8 +46,8 @@ class Pocket {
 public:
     ~Pocket();
     Pocket(int radius, QVector2D position);
-    virtual void render(QPainter &painter);
-    QVector2D getRadius() const;
+    void render(QPainter &painter);
+    double getRadius() const;
     QVector2D getPosition() const;
 
 protected:
@@ -61,8 +61,8 @@ protected:
  */
 class StageTwoTable : public Table {
 public:
-    StageTwoTable(int width, int height, QColor colour, double friction) :
-        Table(width, height, colour, friction, 0, 0) {}
+    StageTwoTable(int width, int height, QColor colour, double friction, std::vector<Pocket*>* pockets) :
+        Table(width, height, colour, friction, 0, 0), m_pockets(pockets) {}
     ~StageTwoTable();
 
     /**

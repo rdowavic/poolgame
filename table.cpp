@@ -16,10 +16,10 @@ void StageTwoTable::render(QPainter &painter) {
     // this renders the table in the old fashioned style tick tick
     Table::render(painter);
     // this gives us our pockety pockets sitting on the table
-    for (Pocket* p : m_pockets) p->render(painter);
+    for (Pocket* p : *m_pockets) p->render(painter);
 }
 
-void StageTwoTable::~StageTwoTable() {
+StageTwoTable::~StageTwoTable() {
     for (auto pocket : *m_pockets) delete pocket;
     delete m_pockets;
 }
@@ -38,7 +38,7 @@ void Pocket::render(QPainter &painter) {
     m_ball->render(painter);
 }
 
-QVector2D Pocket::getRadius() const {
+double Pocket::getRadius() const {
     return m_ball->getRadius();
 }
 

@@ -1,5 +1,7 @@
 #include "stageonefactory.h"
+#include "utils.h"
 #include <QJsonObject>
+#include <QJsonArray>
 
 Ball* StageOneFactory::makeBall(const QJsonObject& ballData) {
     // construct a ball from its values
@@ -91,7 +93,7 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
 
     // make the result now so that we can
     // give the child ball (if there is one) a parent to refer to
-    StageTwoBall* result = new StageTwoBall(
+    StageTwoBall* result = new StageTwoBall (
       QColor(col),
       QVector2D(xpos, ypos),
       QVector2D(0, 0),
@@ -120,8 +122,48 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
 
 Table* StageTwoFactory::makeTable(const QJsonObject &tableData) {
     //construct a Table that has pockets
-    Table* table = StageOneFactory::makeTable();
-    //TODO
+    // create a stage one table based on the fed in json data
+    QString colour = tableData.value("colour").toString();
+
+    // extract width and height from json vals
+    QJsonObject tSize = tableData.value("size").toObject();
+    double width = tSize.value("x").toDouble();
+    double height = tSize.value("y").toDouble();
+
+    double friction = tableData.value("friction").toDouble();
+
+    // an empty pocketResults array that will get filled
+    // as long as the key exists in the thing
+    std::vector<Pocket*>* pocketResults = new std::vector<Pocket*>;
+
+    if (tableData.contains("pockets")) {
+        for (auto pocket : tableData.value("pockets").toArray()) {
+            Pocket* p = makePocket(pocket.toObject());
+            pocketResults->push_back(p);
+        }
+    }
+
+    return new StageTwoTable (
+       width, height,
+       QColor(colour), friction,
+       pocketResults
+    );
+}
+
+Pocket* StageTwoFactory::makePocket(const QJsonObject& pocketData) {
+    // check out what data pocket has
+    // position key
+    // radius key (maybe)
+    QJsonObject position = pocketData.value("position").toObject();
+    double x_pos = position.value("x").toDouble();
+    double y_pos = position.value("y").toDouble();
+
+    double radius = DEFAULT_POCKET_RADIUS;
+
+    if (pocketData.contains("radius"))
+        radius = pocketData.value("radius").toDouble();
+
+    return new Pocket(radius, QVector2D(x_pos, y_pos));
 }
 
 bool StageTwoFactory::properlyContained(StageTwoBall* child, StageTwoBall* parent) {
@@ -131,7 +173,7 @@ bool StageTwoFactory::properlyContained(StageTwoBall* child, StageTwoBall* paren
      * radius size.
      */
     return child->getPosition()
-            .distanceToPoint(
+            .distanceToPoint (
                 parent->getPosition()
              )
            + child->getRadius()

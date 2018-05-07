@@ -53,6 +53,11 @@ public:
     Game* getResult() override;
 };
 
+class StageTwoBuilder : public StageOneBuilder {
+public:
+    StageTwoBuilder() : GameBuilder(new StageTwoFactory()) {}
+};
+
 class GameDirector {
     GameBuilder* m_builder;
     const QJsonObject* m_conf;
