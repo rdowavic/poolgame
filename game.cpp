@@ -1,11 +1,17 @@
 #include "game.h"
 #include "utils.h"
+#include "table.h"
 
 #include <QJsonArray>
 #include <stdexcept>
 #include <cmath>
 
 #include <iostream>
+
+/* how large the window's width should at least be */
+int Game::getMinimumWidth() const { return m_table->getWidth(); }
+/* how large the window's height should at least be */
+int Game::getMinimumHeight() const { return m_table->getHeight(); }
 
 Game::~Game() {
     // cleanup ya boi
@@ -27,13 +33,13 @@ void Game::animate(double dt) {
     for (auto it = m_balls->begin(); it != m_balls->end(); ++it) {
         Ball* ballA = *it;
         // correct ball velocity if colliding with table
-        resolveCollision(m_table, ballA);
+        m_table->resolveCollision(ballA, this);
+
         // check collision with all later balls
         for (auto nestedIt = it + 1; nestedIt != m_balls->end(); ++nestedIt) {
             Ball* ballB = *nestedIt;
             resolveCollision(ballA, ballB);
         }
-
         // move ball due to speed
         ballA->translate(ballA->getVelocity() * dt);
         // apply friction
@@ -41,37 +47,17 @@ void Game::animate(double dt) {
     }
 }
 
-void Game::resolveFall(Ball *b, const Pocket* p) {
-
-}
-
-void Game::resolveCollision(const Table* table, Ball* ball) {
-    QVector2D bPos = ball->getPosition();
-
-    // resulting multiplicity of direction. If a component is set to -1, it
-    // will flip the velocity's corresponding component
-    QVector2D vChange(1,1);
-
-    // ball is beyond left side of table's bounds
-    if (bPos.x() - ball->getRadius() <= table->getX()) {
-        // flip velocity if wrong dir
-        if (ball->getVelocity().x() <= 0) vChange.setX(-1);
-    // ball is beyond right side of table's bounds
-    } else if (bPos.x() + ball->getRadius() >= table->getX() + table->getWidth()) {
-        // flip velocity if wrong dir
-        if (ball->getVelocity().x() >= 0) vChange.setX(-1);
+/**
+ * @brief Game::removeBall deletes the given ball pointed to by b from the vector m_balls
+ * @param b - the ball to remove from the game
+ */
+void Game::removeBall(Ball *b) {
+    for (auto it = m_balls->begin(); it != m_balls->end(); ++it) {
+        if (*it == b) {
+            m_balls->erase(it);
+            delete b;
+        }
     }
-    // ball is above top of the table's bounds
-    if (bPos.y() - ball->getRadius() <= table->getY()) {
-        // flip iff we're travelling in the wrong dir
-        if (ball->getVelocity().y() <= 0) vChange.setY(-1);
-    // ball is beyond bottom of table's bounds
-    } else if (bPos.y() + ball->getRadius() >= table->getY() + table->getHeight()) {
-        // if we're moving down (we want to let the ball bounce up if its heading back)
-        if (ball->getVelocity().y() >= 0) vChange.setY(-1);
-    }
-
-    ball->multiplyVelocity(vChange);
 }
 
 void Game::resolveCollision(Ball* ballA, Ball* ballB) {

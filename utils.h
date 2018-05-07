@@ -29,3 +29,6 @@ const double DEFAULT_BALL_YPOS = 0.0;
 const double DEFAULT_BALL_XVEL = 0.0;
 const double DEFAULT_BALL_YVEL = 0.0;
 
+/** child ball visibility **/
+bool CHILDREN_BALLS_VISIBLE = true;
+

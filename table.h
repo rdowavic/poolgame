@@ -3,6 +3,9 @@
 #include <QColor>
 #include <QPainter>
 #include "ball.h"
+#include "game.h"
+
+class Game;
 
 class Table {
 protected:
@@ -22,6 +25,13 @@ public:
      * @param painter - painter to use
      */
     virtual void render(QPainter& painter);
+
+    /**
+     * @brief resolveCollision - reacts to the situation when a ball touches the side of the table, or interacts
+     * in some way with the table's components
+     * @return void
+     */
+    virtual void resolveCollision(Ball* ball, Game* game);
 
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }
@@ -70,6 +80,15 @@ public:
      * @param painter - the painter to use
      */
     void render(QPainter &painter) override;
+
+    /**
+     * @brief resolveCollision checks whether the ball has fallen into some pocket on the table, or has hit
+     * the side of the table. Will update velocity/positions accordingly.
+     * @param ball - the ball to check whether it has fallen inside a pocket or hit the side of the table
+     */
+    virtual void resolveCollision(Ball* ball, Game* game) override;
+protected:
+    bool fellInside(Ball* ball, Pocket* pocket);
 protected:
     std::vector<Pocket*>* m_pockets;
 };

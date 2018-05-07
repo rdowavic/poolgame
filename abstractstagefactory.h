@@ -3,6 +3,8 @@
 #include "ball.h"
 #include "table.h"
 
+class Table;
+
 class AbstractStageFactory {
 public:
     virtual ~AbstractStageFactory(){}

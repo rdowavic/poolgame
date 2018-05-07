@@ -94,19 +94,9 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
         for (const auto& ball : childBallData) {
             // check if it's actually a valid coordinate
             StageTwoBall* child = makeChildBall(ball.toObject(), result);
-            std::cout << "just made a child ball\n";
-            std::cout << "its position is " << child->getPosition().x() << ", " << child->getPosition().y() << "\n";
-            std::cout << "parent's position is " << result->getPosition().x() << ", " << result->getPosition().y() << "\n";
-            double distance = child->getPosition().distanceToPoint(result->getPosition());
-            std::cout << "distance from parent to child is " << distance << "\n";
-            std::cout << "Parent radius: " << result->getRadius() << "\n";
 
-            if (properlyContained(child, result)) {
+            if (properlyContained(child, result))
                 result->addChild(child);
-                std::cout << "SUCCESS!!!\n";
-            } else {
-
-            }
             // otherwise ignore that whole thing going on there
         }
     }
