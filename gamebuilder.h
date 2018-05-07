@@ -33,6 +33,7 @@ class StageOneBuilder : public GameBuilder {
 public:
     ~StageOneBuilder();
     StageOneBuilder() : GameBuilder(new StageOneFactory()) {}
+    StageOneBuilder(AbstractStageFactory* factory) : GameBuilder(factory) {}
 
     /**
      * @brief addBall creates a ball to the current game being built
@@ -55,7 +56,7 @@ public:
 
 class StageTwoBuilder : public StageOneBuilder {
 public:
-    StageTwoBuilder() : GameBuilder(new StageTwoFactory()) {}
+    StageTwoBuilder() : StageOneBuilder(new StageTwoFactory()) {}
 };
 
 class GameDirector {

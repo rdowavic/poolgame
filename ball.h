@@ -41,8 +41,10 @@ public:
      */
     void multiplyVelocity(const QVector2D& vel) { m_velocity *= vel; }
     virtual double getMass() const { return m_mass; }
+    void setVelocity(QVector2D vel) { m_velocity = vel; }
     double getRadius() const { return m_radius; }
-    QVector2D getPosition() const { return m_pos; }
+    QString getColour() const { return m_brush.color().name(); }
+    virtual QVector2D getPosition() const { return m_pos; }
 };
 
 class StageOneBall : public Ball {
@@ -61,14 +63,16 @@ public:
     ~StageTwoBall();
     virtual QVector2D getVelocity() const override;
     virtual double getMass() const override;
+    virtual QVector2D getPosition() const override;
     virtual void render(QPainter& painter) override;
     /**
      * @brief addChild - add a child ball to the given StageTwoBall
      * @param child - the child ball to add
      */
     void addChild(StageTwoBall* child);
+    int numChildren() { return m_children->size(); }
 protected:
-    std::vector<StageTwoBall*>* m_children = nullptr;
+    std::vector<StageTwoBall*>* m_children = new std::vector<StageTwoBall*>();
     StageTwoBall* m_parent = nullptr; // do not own this, don't attempt to delete
 
 };

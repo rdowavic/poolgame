@@ -44,11 +44,18 @@ QVector2D StageTwoBall::getVelocity() const {
     return Ball::getVelocity();
 }
 
+QVector2D StageTwoBall::getPosition() const {
+    if (m_parent != nullptr) {
+        return m_parent->getPosition() + Ball::getPosition();
+    }
+    return Ball::getPosition();
+}
+
 void StageTwoBall::render(QPainter &painter) {
     painter.setBrush(m_brush);
     // circle centered
-    painter.drawEllipse(m_pos.toPointF(), m_radius, m_radius);
-    // draw children inside
+    painter.drawEllipse(getPosition().toPointF(), m_radius, m_radius);
+    // draw children inside if they exist
     for (StageTwoBall* child : *m_children) {
         child->render(painter);
     }

@@ -41,6 +41,10 @@ void Game::animate(double dt) {
     }
 }
 
+void Game::resolveFall(Ball *b, const Pocket* p) {
+
+}
+
 void Game::resolveCollision(const Table* table, Ball* ball) {
     QVector2D bPos = ball->getPosition();
 

@@ -1,7 +1,9 @@
 #include "stageonefactory.h"
 #include "utils.h"
+#include <iostream>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QLineF>
 
 Ball* StageOneFactory::makeBall(const QJsonObject& ballData) {
     // construct a ball from its values
@@ -44,43 +46,25 @@ Table* StageOneFactory::makeTable(const QJsonObject& tableData) {
 }
 
 Ball* StageTwoFactory::makeBall(const QJsonObject &ballData) {
-    // construct a ball from its values
-    // how to deal with composite shit?? Have to think about that right now? Damn.
-    // TODO!!
-
-    QString col = ballData.value("colour").toString();
-
-    // extract pos into two doubles
-    QJsonObject tPos = ballData.value("position").toObject();
-    double xpos = tPos.value("x").toDouble();
-    double ypos = tPos.value("y").toDouble();
-
-    // extract velocity into two doubles
+    StageTwoBall* ball = makeChildBall(ballData, nullptr);
+    // but its velocity won't be set, so set it
     QJsonObject tVel = ballData.value("velocity").toObject();
     double xvel = tVel.value("x").toDouble();
     double yvel = tVel.value("y").toDouble();
 
-    double mass = ballData.value("mass").toDouble();
-    double radius = ballData.value("radius").toDouble();
+    ball->setVelocity(QVector2D(xvel, yvel));
 
-    // for blah in balls
-    // makeChildBall
-
-    return new StageTwoBall(
-      QColor(col),
-      QVector2D(xpos, ypos),
-      QVector2D(xvel, yvel),
-      mass,
-      radius,
-      nullptr
-    );
+    return ball;
 }
 
 StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageTwoBall* parent) {
     // child balls do not have a 'velocity field'
 
     // for m_brush
-    QString col = ballData.value("colour").toString();
+    QString defaultColour = DEFAULT_BALL_COLOUR;
+    if (parent != nullptr) defaultColour = parent->getColour();
+
+    QString col = ballData.value("colour").toString(defaultColour);
 
     // for m_pos
     QJsonObject tPos = ballData.value("position").toObject();
@@ -88,8 +72,8 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
     double ypos = tPos.value("y").toDouble();
 
     // for mass and radius
-    double mass = ballData.value("mass").toDouble();
-    double radius = ballData.value("radius").toDouble();
+    double mass = ballData.value("mass").toDouble(DEFAULT_BALL_MASS);
+    double radius = ballData.value("radius").toDouble(DEFAULT_BALL_RADIUS);
 
     // make the result now so that we can
     // give the child ball (if there is one) a parent to refer to
@@ -101,6 +85,7 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
       radius,
       parent
     );
+
     // they may or may not have a 'balls' field
     if (ballData.contains("balls")) {
         // then this ball has children, make them
@@ -109,9 +94,19 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
         for (const auto& ball : childBallData) {
             // check if it's actually a valid coordinate
             StageTwoBall* child = makeChildBall(ball.toObject(), result);
+            std::cout << "just made a child ball\n";
+            std::cout << "its position is " << child->getPosition().x() << ", " << child->getPosition().y() << "\n";
+            std::cout << "parent's position is " << result->getPosition().x() << ", " << result->getPosition().y() << "\n";
+            double distance = child->getPosition().distanceToPoint(result->getPosition());
+            std::cout << "distance from parent to child is " << distance << "\n";
+            std::cout << "Parent radius: " << result->getRadius() << "\n";
 
-            if (properlyContained(child, result))
+            if (properlyContained(child, result)) {
                 result->addChild(child);
+                std::cout << "SUCCESS!!!\n";
+            } else {
+
+            }
             // otherwise ignore that whole thing going on there
         }
     }
@@ -177,7 +172,7 @@ bool StageTwoFactory::properlyContained(StageTwoBall* child, StageTwoBall* paren
                 parent->getPosition()
              )
            + child->getRadius()
-           < parent->getRadius();
+           <= parent->getRadius();
 }
 
 

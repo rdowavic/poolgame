@@ -59,5 +59,6 @@ Game* GameDirector::createGame() {
         m_builder->addBall(t);
     }
 
+    // check getResult
     return m_builder->getResult();
 }

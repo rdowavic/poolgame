@@ -12,6 +12,7 @@
 #include <QString>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <iostream>
 
 QJsonObject loadConfig() {
     // load json from config file
@@ -25,13 +26,16 @@ QJsonObject loadConfig() {
 
 int main(int argc, char *argv[])
 {
+
     QJsonObject conf = loadConfig();
 
     // create our game based on our config
     GameDirector director(&conf);
 
-    // set it to be the stage two builder.. when do we choose the factory??
-    if (conf.contains("stage2") && conf.value("stage2").toBool() == true)
+    director.setBuilder(new StageOneBuilder());
+
+//    // set it to be the stage two builder.. when do we choose the factory??
+    if (conf.contains("stage2") && conf.value("stage2").toBool())
         director.setBuilder(new StageTwoBuilder());
     else
         director.setBuilder(new StageOneBuilder());
