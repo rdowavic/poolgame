@@ -28,15 +28,25 @@ void StageOneBuilder::addTable(QJsonObject &tableData) {
 }
 
 Game* StageOneBuilder::getResult() {
-    // no-one called addBall
-    if (m_buildingBalls == nullptr) {
-        // soft fail
-        std::cerr << "warning! pool game without balls created...\n";
-        m_buildingBalls = new std::vector<Ball*>();
-    }
-    // likewise for table
+    // no one called addTable
     if (m_buildingTable == nullptr) {
         throw std::invalid_argument("builder finished with no table supplied");
+    }
+
+    // likewise, no-one called addBall
+    if (m_buildingBalls == nullptr) {
+        // soft fail
+        std::cerr << "warning! no balls provided. Will give you a default cue ball...\n";
+        m_buildingBalls = new std::vector<Ball*>();
+
+        QJsonObject position {
+            {"x", m_buildingTable->getWidth() / 2.0},
+            {"y", m_buildingTable->getHeight() / 2.0}
+        };
+
+        QJsonObject cueBall {{"position", position}};
+
+        m_buildingBalls->push_back(m_factory->makeBall(cueBall));
     }
 
     Game* retGame = new Game(m_buildingBalls, m_buildingTable);
@@ -54,6 +64,9 @@ Game* GameDirector::createGame() {
 
     // for each of our balls, construct them
     QJsonArray ballData = m_conf->value("balls").toArray();
+
+    // if the balls array is empty, make a white ball at the centre of the table
+
     for (const auto& item : ballData) {
         QJsonObject t = item.toObject();
         m_builder->addBall(t);

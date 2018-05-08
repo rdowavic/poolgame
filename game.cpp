@@ -33,6 +33,12 @@ void Game::animate(double dt) {
     for (auto it = m_balls->begin(); it != m_balls->end(); ++it) {
         Ball* ballA = *it;
         // correct ball velocity if colliding with table
+        // or if stage 2, deletes the ball... omg
+        // maybe I should have a batchDelete at the end of one animation
+        // so that I don't get issues with like null pointers
+        // because ballA may not be a valid pointer after resolveCollision
+        // is called, and yet I call resolveCollision(ballA, ballB)
+        // before the thing is over
         m_table->resolveCollision(ballA, this);
 
         // check collision with all later balls
@@ -45,19 +51,35 @@ void Game::animate(double dt) {
         // apply friction
         ballA->changeVelocity(-ballA->getVelocity() * m_table->getFriction() * dt);
     }
+    deleteDeadBalls();
 }
 
 /**
- * @brief Game::removeBall deletes the given ball pointed to by b from the vector m_balls
+ * @brief Game::makeDead deletes the given ball pointed to by b from the vector m_balls
  * @param b - the ball to remove from the game
  */
-void Game::removeBall(Ball *b) {
-    for (auto it = m_balls->begin(); it != m_balls->end(); ++it) {
-        if (*it == b) {
-            m_balls->erase(it);
-            delete b;
+void Game::makeDead(Ball *b) {
+    m_dead_balls->push_back(b);
+}
+
+void Game::deleteDeadBalls() {
+
+    for (auto it = m_dead_balls->begin(); it != m_dead_balls->end(); ++it) {
+        // for each dead ball, go through and find a match with
+        // the one sitting inside the array that's well actually the same
+        // element
+        for (auto jt = m_balls->begin(); jt != m_balls->end(); ++jt) {
+            if (*it == *jt) {
+                // it is the ball inside dead_balls
+                // jt is the ball inside m_balls
+                m_balls->erase(jt);
+                break; // ie stop looking for that shit
+            }
         }
     }
+    // actually deleting the balls from memory
+    for (Ball* b : *m_dead_balls) delete b;
+    m_dead_balls->clear();
 }
 
 void Game::resolveCollision(Ball* ballA, Ball* ballB) {
@@ -66,6 +88,10 @@ void Game::resolveCollision(Ball* ballA, Ball* ballB) {
     // if not colliding (distance is larger than radii)
     QVector2D collisionVector = ballB->getPosition() - ballA->getPosition();
     if (collisionVector.length() > ballA->getRadius() + ballB->getRadius()) return;
+
+    // at this point, ball B and A definitely collided.
+    // we need to check just about here whether either of them will break.
+
     collisionVector.normalize();
 
     float mr = ballB->getMass() / ballA->getMass();
@@ -83,6 +109,18 @@ void Game::resolveCollision(Ball* ballA, Ball* ballB) {
         root = (-b - disc)/(2*a);
     }
 
-    ballA->changeVelocity(mr * (pb - root) * collisionVector);
-    ballB->changeVelocity((root-pb) * collisionVector);
+    QVector2D deltaVa = mr * (pb - root) * collisionVector;
+    QVector2D deltaVb = (root-pb) * collisionVector;
+
+    // now call maybeBreakBall()
+    // remember to changeVelocity(deltaVa) if it DIDN'T BREAK
+    if (ballA->maybeBreakBall(deltaVa, m_balls))
+        makeDead(ballA);
+    else
+        ballA->changeVelocity(deltaVa);
+
+    if (ballB->maybeBreakBall(deltaVb, m_balls))
+        makeDead(ballB);
+    else
+        ballB->changeVelocity(deltaVb);
 }

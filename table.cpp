@@ -47,7 +47,7 @@ void StageTwoTable::resolveCollision(Ball *ball, Game* game) {
     for (Pocket* pocket : *m_pockets) {
        //if fell into table
         if (fellInside(ball, pocket)) {
-            game->removeBall(ball);
+            game->makeDead(ball);
         }
     }
 }

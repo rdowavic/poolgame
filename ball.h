@@ -3,6 +3,7 @@
 #include <QPoint>
 #include <QPainter>
 #include <QVector2D>
+#include <math.h>
 
 class Ball {
 protected:
@@ -45,6 +46,7 @@ public:
     double getRadius() const { return m_radius; }
     QString getColour() const { return m_brush.color().name(); }
     virtual QVector2D getPosition() const { return m_pos; }
+    virtual bool maybeBreakBall(QVector2D deltaV, std::vector<Ball*>* balls) { return false; }
 };
 
 class StageOneBall : public Ball {
@@ -58,8 +60,9 @@ class StageTwoBall : public Ball {
 public:
     StageTwoBall(QColor colour, QVector2D position,
                  QVector2D velocity, double mass, int radius,
-                 StageTwoBall* parent)
-        : Ball(colour, position, velocity, mass, radius), m_parent(parent) {}
+                 StageTwoBall* parent, double strength)
+        : Ball(colour, position, velocity, mass, radius),
+          m_parent(parent), m_strength(strength) {}
     ~StageTwoBall();
     virtual QVector2D getVelocity() const override;
     virtual double getMass() const override;
@@ -70,9 +73,15 @@ public:
      * @param child - the child ball to add
      */
     void addChild(StageTwoBall* child);
+    /**
+     * @brief numChildren - return the number of children this Ball has
+     * @return the number of children
+     */
     int numChildren() { return m_children->size(); }
+    virtual bool maybeBreakBall(QVector2D deltaV, std::vector<Ball *> *balls) override;
 protected:
     std::vector<StageTwoBall*>* m_children = new std::vector<StageTwoBall*>();
     StageTwoBall* m_parent = nullptr; // do not own this, don't attempt to delete
+    double m_strength;
 
 };

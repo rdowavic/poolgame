@@ -74,6 +74,7 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
     // for mass and radius
     double mass = ballData.value("mass").toDouble(DEFAULT_BALL_MASS);
     double radius = ballData.value("radius").toDouble(DEFAULT_BALL_RADIUS);
+    double strength = ballData.value("strength").toDouble(DEFAULT_BALL_STRENGTH);
 
     // make the result now so that we can
     // give the child ball (if there is one) a parent to refer to
@@ -83,7 +84,8 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
       QVector2D(0, 0),
       mass,
       radius,
-      parent
+      parent,
+      strength
     );
 
     // they may or may not have a 'balls' field
@@ -98,6 +100,10 @@ StageTwoBall* StageTwoFactory::makeChildBall(const QJsonObject &ballData, StageT
             if (properlyContained(child, result))
                 result->addChild(child);
             // otherwise ignore that whole thing going on there
+            else {
+                std::cerr << "warning! Child ball not properly contained within parent ball, "
+                          << "This ball will be ignored...\n";
+            }
         }
     }
     // ###### Return the Resultant Ball with #########
@@ -123,6 +129,12 @@ Table* StageTwoFactory::makeTable(const QJsonObject &tableData) {
 
     if (tableData.contains("pockets")) {
         for (auto pocket : tableData.value("pockets").toArray()) {
+            QJsonObject pocketPos = pocket.toObject().value("position").toObject();
+            if (!pocketPos.contains("x") || !pocketPos.contains("y")) {
+               std::cerr << "Warning! This pocket has no x or y position.. going to ignore...\n";
+               continue;
+            }
+
             Pocket* p = makePocket(pocket.toObject());
             pocketResults->push_back(p);
         }

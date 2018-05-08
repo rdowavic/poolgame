@@ -48,5 +48,7 @@ int main(int argc, char *argv[])
     Dialog w(game, nullptr);
     w.show();
 
+    qWarning("help!");
+
     return a.exec();
 }
